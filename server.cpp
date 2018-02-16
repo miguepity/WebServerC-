@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/types.h> 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 //Libreria de hilos
@@ -34,7 +34,7 @@ const char HEADERS_ERROR[] = "HTTP/1.1 404 OK\r\nContent-Type: ";
 const char HEADERS_OK[] = "HTTP/1.1 200 OK\r\nContent-Type: ";
 const char HEADERS_LENGTH[] = "Content-Length: ";
 const char HEADERS_END[]= "\r\n\r\n";
-const char PATH[] = "webServerFiles";
+const char PATH[] = "mi_web";
 
 //Funciones hilo
 void* entradaMensaje(void*);
@@ -49,18 +49,18 @@ void sendFile(fstream&);
 void sendHeaders(const char* ,fstream&);
 
 int main(int argc, char *argv[])
-{ 
-    //Creacion de la estructura de hilo   
-    pthread_t entrada; 
-    pthread_t salida; 
+{
+    //Creacion de la estructura de hilo
+    pthread_t entrada;
+    pthread_t salida;
 
     struct sockaddr_in serv_addr, cli_addr;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-     
-    if (sockfd < 0) 
+
+    if (sockfd < 0)
 	   error("ERROR NO se puede abrir el socket");
-     
+
     bzero((char *) &serv_addr, sizeof(serv_addr));
     portno = 8080;
     serv_addr.sin_family = AF_INET;
@@ -78,23 +78,23 @@ int main(int argc, char *argv[])
         error("ERROR en asociar datos a conexion");
     }
     cout << "Servidor iniciado. Esperando conexiones..." << endl;
-    listen(sockfd,5);	
+    listen(sockfd,5);
 
     clilen = sizeof(cli_addr);
     newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
     if (newsockfd < 0)
         error("ERROR en aceptar");
     cout << "Cliente conectado" << endl;
-    
+
     //Creación del hilo
     pthread_create( &entrada, NULL, entradaMensaje, (void*) NULL );
-    pthread_create( &salida, NULL, salidaMensaje, (void*) NULL );	
+    pthread_create( &salida, NULL, salidaMensaje, (void*) NULL );
     while (1);
     /*
     close(newsockfd);
     close(sockfd);
     */
-    return 0; 
+    return 0;
 }
 
 void* entradaMensaje(void*) {
@@ -112,7 +112,7 @@ void* entradaMensaje(void*) {
         stringstream ss;
         if(tokens.size() >= 3){
             fstream file;
-            
+
             if(tokens[0] == "GET"){
                 ss << PATH << tokens[1];
                 file.open (ss.str().c_str(), fstream::in);
@@ -130,7 +130,7 @@ void* entradaMensaje(void*) {
                 cout << "response sent";
             }else{
                 cout << "404 NOT FOUND COULDN'T OPEN FILE" << endl;
-                
+
                 if(tokens[1] == "/"){
                     ss << PATH << "index.html";
                     file.open(ss.str().c_str(),fstream::in);
@@ -144,7 +144,7 @@ void* entradaMensaje(void*) {
                 }
             }
             file.close();
-        }        
+        }
 	}
 }
 
@@ -157,7 +157,7 @@ void* salidaMensaje(void*) {
     		bzero(buffer,1024);
 	        fgets(buffer,1023,stdin);
 		n = write(newsockfd,buffer,strlen(buffer));
-		if (n < 0) 
+		if (n < 0)
 		         error("ERROR writing to socket");
 	}
 }
@@ -191,13 +191,13 @@ void sendHeaders(const char* contentType, fstream& file){
     int OUTPUT_LENGTH = fileStreamSize(file);
     if(OUTPUT_LENGTH <= 0){
         response << HEADERS_ERROR;
-        fstream errorFile ("webServerFiles/error.html",fstream::in);
+        fstream errorFile ("mi_web/error.html",fstream::in);
         OUTPUT_LENGTH = fileStreamSize(errorFile);
         errorFile.close();
     }else{
         response << HEADERS_OK;
     }
-    
+
     //FORMATO MIME
     if(strstr(contentType,".htm")){
         response << "text/html";
@@ -212,7 +212,7 @@ void sendHeaders(const char* contentType, fstream& file){
     }else{
         response << "text/plain";
     }
-    
+
     response << "\r\n" << HEADERS_LENGTH << OUTPUT_LENGTH << HEADERS_END;
     n= write(newsockfd, response.str().c_str(),response.str().length());
     if (n < 0)
@@ -223,7 +223,7 @@ void sendFile(fstream& file){
     int bufferSize = fileStreamSize(file);
     if(bufferSize > 0){
         bufferData = new char[bufferSize];
-        file.read(bufferData, bufferSize);   
+        file.read(bufferData, bufferSize);
     }else{
         //SEND ERROR HTML FILE
         stringstream ss;

@@ -1,0 +1,23 @@
+body{
+  background-image: url("darkside.jpg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+}
+
+h1 {
+  color: #ffff;
+  padding-left: 40%;
+  padding-top: 10%;
+}
+
+p {
+  color: #ffff;
+  padding-left: 20%;
+  padding-right: 20%;
+}
+
+a {
+  padding-left: 20%;
+}
