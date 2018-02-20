@@ -118,8 +118,6 @@ void* entradaMensaje(void*) {
                 file.open (ss.str().c_str(), fstream::in);
             }else if(tokens[0] == "POST"){
 
-            }else if(tokens[0] == "DELETE"){
-
             }else if(tokens[0] == "PUT"){
 
             }
